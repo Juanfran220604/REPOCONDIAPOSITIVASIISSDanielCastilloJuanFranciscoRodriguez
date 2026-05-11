@@ -1,7 +1,7 @@
 services:
   sonarqube:
     image: sonarqube:lts-community
-    container_name: sonarqube
+    container_name: sonarqubep
     depends_on:
       - db
     ports:
