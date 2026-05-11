@@ -18,7 +18,9 @@ pipeline {
             description: 'Ruta del archivo markdown a procesar'
         )
     }
-
+    environment {
+        SONAR_TOKEN = credentials('sonar-token')
+    }
     stages {
         stage('Checkout desde SCM') {
             steps {
@@ -26,7 +28,21 @@ pipeline {
                 sh 'ls -la'
             }
         }
-
+        stage('SonarQube Analysis') {
+            steps {
+                // Se utiliza el scanner oficial en un contenedor Docker para un entorno reproducible [2, 5]
+                sh """
+                    docker run --rm \
+                        --network sonarqube_network \
+                        -e SONAR_HOST_URL="http://sonarqube:9000" \
+                        -e SONAR_TOKEN=${SONAR_TOKEN} \
+                        -v "${WORKSPACE}:/usr/src" \
+                        sonarsource/sonar-scanner-cli \
+                        -Dsonar.projectKey=marp-slides-project \
+                        -Dsonar.sources=/usr/src
+                """
+            }
+        }
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
