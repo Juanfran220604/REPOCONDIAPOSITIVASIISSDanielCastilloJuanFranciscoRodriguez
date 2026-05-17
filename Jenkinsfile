@@ -46,6 +46,10 @@ pipeline {
     }
 }
         stage('Instalación de dependencias y generación del PDF') {
+            environment {
+                DOCKER_BUILDKIT = '0'
+            }
+
             agent {
                 dockerfile {
                     filename 'Dockerfile'
@@ -53,30 +57,9 @@ pipeline {
                     reuseNode true
                 }
             }
+
             steps {
-                sh '''
-                    node --version
-                    npm --version
-
-                    if [ ! -f "${MD_FILE}" ]; then
-                        echo "ERROR: no existe el archivo ${MD_FILE}"
-                        exit 1
-                    fi
-
-                    export HOME="$WORKSPACE"
-                    export npm_config_cache="$WORKSPACE/.npm"
-
-                    mkdir -p "$npm_config_cache"
-
-                    npm install --no-save @marp-team/marp-cli
-
-                    mkdir -p pdf
-                    nombre_pdf=$(basename "${MD_FILE}" .md)
-
-                    npx @marp-team/marp-cli "${MD_FILE}" --pdf --allow-local-files -o "pdf/${nombre_pdf}.pdf"
-
-                    ls -lh pdf
-                '''
+                sh 'docker pull node:22-bookworm'
             }
         }
 
