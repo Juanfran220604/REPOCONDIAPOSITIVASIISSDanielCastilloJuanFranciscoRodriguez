@@ -30,22 +30,26 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh '''
-                    # Paso vital: Crear la red dentro del motor DinD si no existe
-                    docker network create sonarqube_network || true
-                    
-                    docker run --rm \
-                        --network sonarqube_network \
-                        -e SONAR_HOST_URL="http://sonarqubep:9000" \
-                        -e SONAR_TOKEN=${SONAR_TOKEN} \
-                        -v "${WORKSPACE}:/usr/src" \
-                        sonarsource/sonar-scanner-cli \
-                        -Dsonar.projectKey=marp-slides-project \
-                        -Dsonar.sources=. \
-                        -Dsonar.inclusions="**/*"
-                '''
-    }
-}
+                // Ajusta 'SonarQube' al nombre que configuraste en la interfaz de Jenkins
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        # Crear la red dentro del motor si no existe
+                        docker network create sonarqube_network || true
+                        
+                        docker run --rm \
+                            --network sonarqube_network \
+                            -e SONAR_HOST_URL="http://sonarqubep:9000" \
+                            -e SONAR_TOKEN=${SONAR_TOKEN} \
+                            -v "${WORKSPACE}:/usr/src" \
+                            sonarsource/sonar-scanner-cli \
+                            -Dsonar.projectKey=marp-slides-project \
+                            -Dsonar.sources=. \
+                            -Dsonar.inclusions="**/*" \
+                            -Dsonar.scm.provider=git
+                    '''
+                }
+            }
+        }
         stage('Quality Gate') {
             steps {
                 waitForQualityGate abortPipeline: true
