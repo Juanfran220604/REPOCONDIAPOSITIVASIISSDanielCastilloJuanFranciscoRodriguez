@@ -30,10 +30,8 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                // Ajusta 'SonarQube' al nombre que configuraste en la interfaz de Jenkins
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        # Crear la red dentro del motor si no existe
                         docker network create sonarqube_network || true
                         
                         docker run --rm \
@@ -45,7 +43,7 @@ pipeline {
                             -Dsonar.projectKey=marp-slides-project \
                             -Dsonar.sources=. \
                             -Dsonar.inclusions="**/*" \
-                            -Dsonar.scm.provider=git
+                            -Dsonar.scm.disabled=true
                     '''
                 }
             }
