@@ -31,9 +31,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 sh '''
-                    # Intentar crear la red por si no existe en este entorno
-                    docker network create sonarqube_network || true
-                    
                     docker run --rm \
                         --network sonarqube_network \
                         -e SONAR_HOST_URL="http://sonarqubep:9000" \
@@ -43,8 +40,8 @@ pipeline {
                         -Dsonar.projectKey=marp-slides-project \
                         -Dsonar.sources=/usr/src
                 '''
-    }
-}
+            }
+        }
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
