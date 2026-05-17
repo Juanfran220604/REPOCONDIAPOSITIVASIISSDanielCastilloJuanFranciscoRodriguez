@@ -1,16 +1,4 @@
 services:
-  jenkins:
-    build: .
-    container_name: jenkinsp
-    ports:
-      - "8080:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - sonarqube_network
-
   sonarqube:
     image: sonarqube:lts-community
     container_name: sonarqubep
@@ -24,6 +12,8 @@ services:
       SONAR_JDBC_PASSWORD: sonarqube
     volumes:
       - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
     networks:
       - sonarqube_network
 
@@ -40,8 +30,9 @@ services:
       - sonarqube_network
 
 volumes:
-  jenkins_home:
   sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
   postgresql:
 
 networks:
