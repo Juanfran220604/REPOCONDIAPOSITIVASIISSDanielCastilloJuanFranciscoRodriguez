@@ -31,6 +31,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 sh '''
+                    # Paso vital: Crear la red dentro del motor DinD si no existe
+                    docker network create sonarqube_network || true
+                    
                     docker run --rm \
                         --network sonarqube_network \
                         -e SONAR_HOST_URL="http://sonarqubep:9000" \
@@ -40,8 +43,8 @@ pipeline {
                         -Dsonar.projectKey=marp-slides-project \
                         -Dsonar.sources=/usr/src
                 '''
-            }
-        }
+    }
+}
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
