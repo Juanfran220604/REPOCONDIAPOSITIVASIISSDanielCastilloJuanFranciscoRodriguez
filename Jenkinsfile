@@ -34,7 +34,7 @@ pipeline {
                 sh '''
                     docker run --rm \
                         --network sonarqube_network \
-                        -e SONAR_HOST_URL="http://sonarqube:9000" \
+                        -e SONAR_HOST_URL="http://sonarqubep:9000" \
                         -e SONAR_TOKEN=${SONAR_TOKEN} \
                         -v "${WORKSPACE}:/usr/src" \
                         sonarsource/sonar-scanner-cli \
