@@ -32,12 +32,11 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        # Asegurar que la red existe
+                        # Asegurar la existencia de la red
                         docker network create sonarqube_network || true
                         
-                        # Ejecutar el scanner forzando el ID de usuario de Jenkins
+                        # Ejecutar el scanner y pedirle que espere el Quality Gate de forma nativa
                         docker run --rm \
-                            --user "$(id -u):$(id -g)" \
                             --network sonarqube_network \
                             -e SONAR_HOST_URL="http://sonarqubep:9000" \
                             -e SONAR_TOKEN=${SONAR_TOKEN} \
@@ -46,16 +45,13 @@ pipeline {
                             -Dsonar.projectKey=marp-slides-project \
                             -Dsonar.sources=. \
                             -Dsonar.inclusions="**/*" \
-                            -Dsonar.scm.disabled=true
+                            -Dsonar.scm.disabled=true \
+                            -Dsonar.qualitygate.wait=true
                     '''
                 }
             }
         }
-        stage('Quality Gate') {
-            steps {
-                waitForQualityGate abortPipeline: true
-    }
-}
+        
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
