@@ -29,20 +29,22 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            steps {
-                // Usamos comillas simples (''') para que Jenkins pase el secreto de forma segura
-                sh '''
-                    docker run --rm \
-                        --network sonarqube_network \
-                        -e SONAR_HOST_URL="http://sonarqubep:9000" \
-                        -e SONAR_TOKEN=${SONAR_TOKEN} \
-                        -v "${WORKSPACE}:/usr/src" \
-                        sonarsource/sonar-scanner-cli \
-                        -Dsonar.projectKey=marp-slides-project \
-                        -Dsonar.sources=/usr/src
-                '''
-            }
-        }
+    steps {
+        // Diagnóstico: lista las redes que ve Jenkins
+        sh 'docker network ls' 
+        
+        sh '''
+            docker run --rm \
+                --network sonarqube_network \
+                -e SONAR_HOST_URL="http://sonarqubep:9000" \
+                -e SONAR_TOKEN=${SONAR_TOKEN} \
+                -v "${WORKSPACE}:/usr/src" \
+                sonarsource/sonar-scanner-cli \
+                -Dsonar.projectKey=marp-slides-project \
+                -Dsonar.sources=/usr/src
+        '''
+    }
+}
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
