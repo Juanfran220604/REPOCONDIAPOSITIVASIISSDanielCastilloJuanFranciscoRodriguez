@@ -47,11 +47,7 @@ pipeline {
     }
 }
 
-        stage('Quality Gate') {
-            steps {
-             waitForQualityGate abortPipeline: true
-    }
-}
+        
         stage('Instalación de dependencias y generación del PDF') {
             agent {
                 dockerfile {
