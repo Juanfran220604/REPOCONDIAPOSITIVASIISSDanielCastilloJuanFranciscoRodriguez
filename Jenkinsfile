@@ -30,8 +30,8 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                // Se utiliza el scanner oficial en un contenedor Docker para un entorno reproducible [2, 5]
-                sh """
+                // Usamos comillas simples (''') para que Jenkins pase el secreto de forma segura
+                sh '''
                     docker run --rm \
                         --network sonarqube_network \
                         -e SONAR_HOST_URL="http://sonarqube:9000" \
@@ -40,7 +40,7 @@ pipeline {
                         sonarsource/sonar-scanner-cli \
                         -Dsonar.projectKey=marp-slides-project \
                         -Dsonar.sources=/usr/src
-                """
+                '''
             }
         }
         stage('Instalación de dependencias y generación del PDF') {

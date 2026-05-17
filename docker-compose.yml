@@ -33,8 +33,7 @@ volumes:
   sonarqube_data:
   sonarqube_logs:
   sonarqube_extensions:
-  postgresql:
-
+  
 networks:
   sonarqube_network:
     name: sonarqube_network
