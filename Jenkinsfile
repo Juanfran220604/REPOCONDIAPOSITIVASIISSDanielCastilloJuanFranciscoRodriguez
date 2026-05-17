@@ -35,7 +35,7 @@ pipeline {
                         # 1. Asegurar que la red de Docker existe
                         docker network create sonarqube_network || true
                         
-                        # 2. Ejecutar el contenedor del Scanner con los nuevos parámetros
+                        # 2. Ejecutar el contenedor del Scanner con los parámetros correctos
                         docker run --rm \
                             --network sonarqube_network \
                             -e SONAR_HOST_URL="http://sonarqubep:9000" \
@@ -44,8 +44,7 @@ pipeline {
                             sonarsource/sonar-scanner-cli \
                             -Dsonar.projectKey=marp-slides-project \
                             -Dsonar.sources=. \
-                            -Dsonar.inclusions="**/*.md,**/Dockerfile" \
-                            -Dsonar.lang.patterns.text="**/*.md" \
+                            -Dsonar.html.file.suffixes=.html,.md \
                             -Dsonar.scm.disabled=true \
                             -Dsonar.qualitygate.wait=true
                     '''
