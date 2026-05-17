@@ -41,8 +41,15 @@ pipeline {
                         -v "${WORKSPACE}:/usr/src" \
                         sonarsource/sonar-scanner-cli \
                         -Dsonar.projectKey=marp-slides-project \
-                        -Dsonar.sources=/usr/src
+                        -Dsonar.sources=. \
+                        -Dsonar.inclusions="**/*"
                 '''
+    }
+}
+
+        stage('Quality Gate') {
+            steps {
+             waitForQualityGate abortPipeline: true
     }
 }
         stage('Instalación de dependencias y generación del PDF') {
