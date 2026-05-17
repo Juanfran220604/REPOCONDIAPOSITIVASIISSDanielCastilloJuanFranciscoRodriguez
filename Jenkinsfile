@@ -32,9 +32,12 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
+                        # Asegurar que la red existe
                         docker network create sonarqube_network || true
                         
+                        # Ejecutar el scanner forzando el ID de usuario de Jenkins
                         docker run --rm \
+                            --user "$(id -u):$(id -g)" \
                             --network sonarqube_network \
                             -e SONAR_HOST_URL="http://sonarqubep:9000" \
                             -e SONAR_TOKEN=${SONAR_TOKEN} \
