@@ -46,22 +46,30 @@ pipeline {
     }
 }
         stage('Instalación de dependencias y generación del PDF') {
-            environment {
-                DOCKER_BUILDKIT = '0'
-            }
 
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    dir '.'
-                    reuseNode true
-                }
-            }
+            agent any
 
             steps {
-                sh 'docker pull node:22-bookworm'
-            }
-        }
+                sh '''
+                set -e
+
+                docker build -t pdf-builder -f Dockerfile .
+
+                docker run --rm \
+                -v $WORKSPACE:/app \
+                -w /app \
+                pdf-builder \
+                bash -c "
+                    node --version &&
+                    npm install -g @marp-team/marp-cli &&
+                    mkdir -p pdf &&
+                    npx @marp-team/marp-cli ${MD_FILE} --pdf --allow-local-files -o pdf/output.pdf
+                "
+
+                ls -lh pdf
+                '''
+    }
+}
 
         stage('Archivado del artefacto') {
             steps {
