@@ -1,7 +1,7 @@
 services:
   jenkins:
     build: .
-    container_name: jenkins
+    container_name: jenkinsp
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -13,7 +13,7 @@ services:
 
   sonarqube:
     image: sonarqube:lts-community
-    container_name: sonarqube
+    container_name: sonarqubep
     depends_on:
       - db
     ports:
