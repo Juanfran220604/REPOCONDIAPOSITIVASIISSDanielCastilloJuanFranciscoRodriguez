@@ -28,29 +28,7 @@ pipeline {
                 sh 'ls -la'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        # 1. Asegurar que la red de Docker existe
-                        docker network create sonarqube_network || true
-                        
-                        # 2. Ejecutar el contenedor del Scanner con los parámetros correctos
-                        docker run --rm \
-                            --network sonarqube_network \
-                            -e SONAR_HOST_URL="http://sonarqubep:9000" \
-                            -e SONAR_TOKEN=${SONAR_TOKEN} \
-                            -v "${WORKSPACE}:/usr/src" \
-                            sonarsource/sonar-scanner-cli \
-                            -Dsonar.projectKey=marp-slides-project \
-                            -Dsonar.sources=. \
-                            -Dsonar.html.file.suffixes=.html,.md \
-                            -Dsonar.scm.disabled=true \
-                            -Dsonar.qualitygate.wait=true
-                    '''
-                }
-            }
-        }
+        
 
         stage('Instalación de dependencias y generación del PDF') {
             agent {
@@ -82,7 +60,29 @@ pipeline {
                 '''
     }
 }
-
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        # 1. Asegurar que la red de Docker existe
+                        docker network create sonarqube_network || true
+                        
+                        # 2. Ejecutar el contenedor del Scanner con los parámetros correctos
+                        docker run --rm \
+                            --network sonarqube_network \
+                            -e SONAR_HOST_URL="http://sonarqubep:9000" \
+                            -e SONAR_TOKEN=${SONAR_TOKEN} \
+                            -v "${WORKSPACE}:/usr/src" \
+                            sonarsource/sonar-scanner-cli \
+                            -Dsonar.projectKey=marp-slides-project \
+                            -Dsonar.sources=. \
+                            -Dsonar.html.file.suffixes=.html,.md \
+                            -Dsonar.scm.disabled=true \
+                            -Dsonar.qualitygate.wait=true
+                    '''
+                }
+            }
+        }
         stage('Archivado del artefacto') {
             steps {
                 archiveArtifacts artifacts: 'pdf/*.pdf', fingerprint: true, onlyIfSuccessful: true
